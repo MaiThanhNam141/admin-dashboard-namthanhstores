@@ -230,15 +230,15 @@ const Users = () => {
                 <div>
                     {Array.from({ length: Math.ceil(users.length / usersPerPage) }, (_, index) => (
                         <span key={index} style={{
-                            borderWidth: '50px',
-                            borderRadius: '15px',
+                            border: '2px solid #000',
                             color: '#000',
                             backgroundColor: '#f9f9f9',
-                            padding: '5px 10px', 
-                            display: 'block',
-                            margin: '0 5px' ,
-                            borderColor:'#000',
-                        }}>
+                            padding: '5px 10px',
+                            display: 'inline-block',
+                            margin: '0 5px',
+                            cursor: 'pointer'
+                        }}
+                            onClick={() => setCurrentPage(index + 1)}>
                             {index + 1}
                         </span>
                     ))}
@@ -312,13 +312,13 @@ const styles = {
         justifyContent: 'space-between',
         alignItems: 'center',
         marginTop: '20px',
-        width: '100%',
+        width: '50%',
     },
     btnNavigationPage: {
-        borderWidth: 0,
         backgroundColor: 'rgba(0, 0, 0, 0)',
         width: '50px',
         height: '80px',
-        borderRadius: '100px',
+        cursor: 'pointer',
+        border: '0px'
     }
 };

@@ -6,7 +6,10 @@ import Statistics from './pages/Statistics.jsx';
 import Orders from './pages/Orders.jsx';
 import Products from './pages/Products.jsx';
 import Users from './pages/Users.jsx';
+import NotFound from './pages/NotFound.jsx';
+
 import { AuthContext } from './context/AuthContext.jsx';
+import FCM from './pages/FCM.jsx';
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -26,8 +29,10 @@ function App() {
           <Route path="orders" element={<Orders />} />
           <Route path="products" element={<Products />} />
           <Route path="users" element={<Users />} />
+          <Route path="fcm" element={<FCM />} />
         </Route>
         <Route path="login" element={<Login />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

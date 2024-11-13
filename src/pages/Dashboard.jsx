@@ -5,6 +5,7 @@ import Logo from "../assets/logo.png";
 import Sidebar from '../component/Sidebar';
 import { auth } from "../firebase/config"
 import { signOut } from '@firebase/auth';
+import '../style/Login.css'
 
 const Dashboard = () => {
   const { currentUser, dispatch } = useContext(AuthContext);
@@ -15,9 +16,8 @@ const Dashboard = () => {
       await signOut(auth);
       dispatch({ type: "LOGOUT" });
       console.log("Done");
-
     } catch (error) {
-
+      console.log(error);
     }
   };
 
@@ -37,13 +37,13 @@ const Dashboard = () => {
             </div>
           </Link>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             {currentUser && (
               <>
                 <span>{currentUser.email}</span>
                 <button
                   onClick={handleLogout}
-                  style={{ backgroundColor: '#EF4444', color: 'white', padding: '0.25rem 1rem', borderRadius: '0.375rem', cursor: 'pointer', marginRight: '30px' }}
+                  class="btn"
                 >
                   Đăng xuất
                 </button>
@@ -60,5 +60,5 @@ const Dashboard = () => {
     </div>
   );
 };
-
+  
 export default Dashboard;

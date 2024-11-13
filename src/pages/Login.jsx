@@ -6,14 +6,15 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../context/AuthContext';
 import loadingGif from '../assets/loading.gif';
+import '../style/Login.css'
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
     const { dispatch } = useContext(AuthContext)
 
     const handleEmailChange = (e) => {
@@ -30,11 +31,24 @@ const Login = () => {
 
     const handleLogin = async (event) => {
         event.preventDefault();
-        setLoading(true);
+        Swal.fire({
+            title: 'Đang đăng nhập...',
+            html: `<img src="${loadingGif}" alt="Loading" style="width: 350px; height: 150px;" />`,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+            didDestroy: () => {
+                Swal.hideLoading();
+            },
+            didClose: () => {
+                Swal.hideLoading();
+            },
+        });
         const e = email.trim();
         const p = password.trim();
         if (!e || e.length < 6) {
-            setLoading(false);
             Swal.fire({
                 title: 'Đăng nhập thất bại!',
                 text: 'Email quá ngắn. Vui lòng thử lại.',
@@ -45,7 +59,6 @@ const Login = () => {
             return null;
         }
         if (!p || p.length < 6) {
-            setLoading(false);
             Swal.fire({
                 title: 'Đăng nhập thất bại!',
                 text: 'Mật khẩu quá ngắn. Vui lòng thử lại.',
@@ -80,9 +93,6 @@ const Login = () => {
         } catch (error) {
             console.error("signin function error: ", error)
         }
-        finally {
-            setLoading(false);
-        }
     };
 
     return (
@@ -95,13 +105,6 @@ const Login = () => {
                         style={{ width: '20%', marginBottom: '20px' }}
                     />
                 </div>
-                {
-                    loading && (
-                        <div style={{ marginTop: '10px' }}>
-                            <img src={loadingGif} alt="Loading" style={{ width: '30%' }} />
-                        </div>
-                    )
-                }
                 <div style={{ width: '65%', height: '400px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }} >
                     <form action="#" method="POST" style={{ display: 'flex', flexDirection: 'column' }}>
                         <div style={{ marginBottom: '15px' }}>
@@ -195,19 +198,7 @@ const Login = () => {
                             <button
                                 type="submit"
                                 onClick={handleLogin}
-                                style={{
-                                    backgroundColor: 'white',
-                                    color: '#87bc9d',
-                                    border: '1px solid #87bc9d',
-                                    fontWeight: 'bold',
-                                    padding: '20px',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    marginTop: '40px',
-                                    width: '80%',
-                                    height: '80px',
-                                    fontSize: '25px'
-                                }}
+                                class='btn'
                             >
                                 Đăng nhập
                             </button>
