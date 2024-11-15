@@ -19,33 +19,32 @@ const Orders = () => {
                 const ordersCollectionRef = collection(db, 'orders');
                 const snapshot = await getDocs(ordersCollectionRef);
     
-                const orderList = await Promise.all(
-                    snapshot.docs.map(async (doc, index) => {
-                        const orderData = doc.data();
-                        const userRef = orderData.app_user;
+                const orderList = snapshot.docs.map(async (orderDoc, index) => {
+                    const orderData = orderDoc.data();
+                    
+                    // Lấy email từ embed_data
+                    const email = orderData.embed_data && orderData.embed_data.email ? orderData.embed_data.email : "Không có email";
     
-                        // Fetch user data based on reference
-                        const userDoc = await getDoc(userRef);
-                        const userEmail = userDoc.exists() ? userDoc.data().email : "Unknown";
+                    // Lấy tên sản phẩm từ itemData
+                    const itemNames = await Promise.all(orderData.item.map(async (product) => {
+                        const productDoc = await getDoc(doc(db, "productFood", product.id)); // Lấy thông tin sản phẩm
+                        return productDoc.exists() ? productDoc.data().name : "Không tìm thấy sản phẩm";
+                    }));
     
-                        // Fetch product names from itemData
-                        const itemNames = await Promise.all(orderData.item.map(async (productId) => {
-                            const productDoc = await getDoc(doc(db, "productFood", productId));
-                            return productDoc.exists() ? productDoc.data().name : "Không tìm thấy sản phẩm";
-                        }));
-    
-                        return {
-                            id: doc.id,
-                            ...orderData,
-                            email: userEmail,
-                            amount_formated: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(orderData.amount),
-                            server_time_formated: new Date(orderData.server_time).toLocaleString(),
-                            itemData: itemNames, // Lưu tên sản phẩm
-                            index: index + 1,
-                        };
-                    })
-                );
-                setOrders(orderList);
+                    return {
+                        id: orderDoc.id,
+                        ...orderData,
+                        email: email, // Email lấy từ embed_data
+                        amount_formated: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(orderData.amount),
+                        server_time_formated: new Date(orderData.server_time).toLocaleString(),
+                        itemData: itemNames, // Lưu tên sản phẩm
+                        index: index + 1,
+                    };
+                });
+                
+                // Chờ tất cả các promise hoàn thành
+                const ordersData = await Promise.all(orderList);
+                setOrders(ordersData);
             } catch (error) {
                 console.error("Error fetching orders: ", error);
             }
@@ -76,7 +75,7 @@ const Orders = () => {
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <strong>Người dùng:</strong> 
-                    <span>${item.app_user.path}</span>
+                    <span>${item.app_user}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <strong>Số tiền:</strong> 
@@ -112,7 +111,7 @@ const Orders = () => {
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <strong>Thông tin mặt hàng:</strong> 
-                    <span>${item.item}</span>
+                    <span>${item.itemData}</span>
                 </div>
             `,
             icon: 'info',

@@ -170,7 +170,7 @@ const Statistics = () => {
         <div style={styles.container}>
 
             <h1 style={styles.text}>Doanh thu theo tháng</h1>
-            <div style={{ width: '80%', height: '400px', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ height: '400px', width:'50%', flex: 1, marginBottom:'100px' }}>
                 <Bar data={revenueChartData} />
             </div>
             <h1
@@ -191,7 +191,7 @@ const Statistics = () => {
                     <p>Bạn có thể sử dụng thông tin này để theo dõi sự thay đổi trong hoạt động của người dùng.</p>
                 </div>
             </Tooltip>
-            <div style={{ width: '80%', height: '400px', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ height: '400px', width:'50%', flex: 1, marginBottom:'100px' }}>
                 <Line data={UserActivityOverTime} options={optionsUserActivityOverTime}/>
             </div>
 
@@ -201,7 +201,7 @@ const Statistics = () => {
                     <span>Thời gian tương tác trung bình trên mỗi người dùng hoạt động trong khoảng thời gian đã chọn.</span>
                 </div>
             </Tooltip>
-            <div style={{ width: '80%', height: '400px', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ height: '400px', width:'50%', flex: 1, marginBottom:'100px' }}>
                 <Line data={engagementChartData} />
             </div>
         </div>

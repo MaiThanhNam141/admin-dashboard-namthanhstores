@@ -22,12 +22,12 @@ const Dashboard = () => {
   };
 
   return (
-    <div style={{ display: 'flex', backgroundColor: '#f7f7f7', color: '#F9FAFB', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', backgroundColor: '#f7f7f7', color: '#F9FAFB', overflow: 'hidden', paddingTop:'2px' }}>
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main Content */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft:'3px' }}>
         {/* Navbar */}
         <div style={{ width: '100%', backgroundColor: '#DEFFD3', color: '#3E3E3E', height: '4rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem', borderRadius: 5 }}>
           <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>

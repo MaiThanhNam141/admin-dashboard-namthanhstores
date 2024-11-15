@@ -44,12 +44,13 @@ const Sidebar = () => {
 						padding: '8px',
 						borderRadius: '9999px',
 						transition: 'background-color 0.3s',
-						maxWidth: 'fit-content',
+						maxWidth: '45px',
+						maxHeight: '45px',
 						cursor: 'pointer',
 						backgroundColor:'#DEFFD3'
 					}}
 				>
-					<Menu size={24} />
+					<Menu size={25} />
 				</motion.button>
 
 				<nav style={{ marginTop: '32px', flexGrow: 1 }}>
