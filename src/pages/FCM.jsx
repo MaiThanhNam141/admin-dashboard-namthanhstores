@@ -9,7 +9,7 @@ const FCm = () => {
 
     const sendFCMNotification = async (title, body) => {
         try {
-            const response = await fetch('http://localhost:3001/send-notification', {
+            const response = await fetch('https://us-central1-namthanhstores.cloudfunctions.net/sendNotification', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
