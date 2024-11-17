@@ -18,19 +18,18 @@ const Orders = () => {
             try {
                 const ordersCollectionRef = collection(db, 'orders');
                 const snapshot = await getDocs(ordersCollectionRef);
-    
+
                 const orderList = snapshot.docs.map(async (orderDoc, index) => {
                     const orderData = orderDoc.data();
-                    
+
                     // Lấy email từ embed_data
                     const email = orderData.embed_data && orderData.embed_data.email ? orderData.embed_data.email : "Không có email";
-    
+
                     // Lấy tên sản phẩm từ itemData
                     const itemNames = await Promise.all(orderData.item.map(async (product) => {
-                        const productDoc = await getDoc(doc(db, "productFood", product.id)); // Lấy thông tin sản phẩm
+                        const productDoc = await getDoc(doc(db, "productFood", product.id));
                         return productDoc.exists() ? productDoc.data().name : "Không tìm thấy sản phẩm";
                     }));
-    
                     return {
                         id: orderDoc.id,
                         ...orderData,
@@ -41,7 +40,7 @@ const Orders = () => {
                         index: index + 1,
                     };
                 });
-                
+
                 // Chờ tất cả các promise hoàn thành
                 const ordersData = await Promise.all(orderList);
                 setOrders(ordersData);
@@ -49,7 +48,7 @@ const Orders = () => {
                 console.error("Error fetching orders: ", error);
             }
         };
-        
+
         fetchOrders();
     }, []);
 
@@ -65,7 +64,30 @@ const Orders = () => {
         }
     };
 
-    const handleInfo = (item) => { 
+    const sendNotificationToUser = async (title, body, token) => {
+        try {
+            const response = await fetch('https://us-central1-namthanhstores.cloudfunctions.net/sendNotificationToUser', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title, body, token }),
+            })
+    
+            if (response.ok) {
+                console.log('Successfully sent message to user');
+                return true;
+            } else {
+                console.error('Error sending message to user:', await response.json())
+                throw new Error('Failed to send message to user');
+            }
+        } catch (error) {
+            console.error('Error sending message to user:', error)
+            throw error;
+        }
+    }
+
+    const handleInfo = (item) => {
         Swal.fire({
             title: 'Thông tin về đơn hàng',
             html: `
@@ -86,12 +108,12 @@ const Orders = () => {
                     <span>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.discount_amount)}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
-                    <strong>Phí người dùng:</strong> 
-                    <span>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.user_fee_amount)}</span>
+                    <strong>Tình trạng đơn hàng:</strong> 
+                    <span>${item.embed_data.status}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
-                    <strong>Kênh:</strong> 
-                    <span>${item.channel}</span>
+                    <strong>Mô tả của người dùng:</strong> 
+                    <span>${item.embed_data.note || "Không có mô tả"}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <strong>Thời gian server:</strong> 
@@ -105,20 +127,23 @@ const Orders = () => {
                     <strong>ID người dùng ZP:</strong> 
                     <span>${item.zp_user_id}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <strong>Dữ liệu nhúng:</strong> 
-                    <span>${item.embed_data}</span>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <strong>Thông tin mặt hàng:</strong> 
-                    <span>${item.itemData}</span>
+                <div style="margin-top: 20px;">
+                    <strong>Danh sách sản phẩm:</strong>
+                    <ul>
+                        ${item.itemData.map((productName, index) => `
+                            <li>
+                                <strong>${productName}</strong> - ${item.item[index].itemCount} bao
+                            </li>
+                        `).join('')}
+                    </ul>
                 </div>
             `,
             icon: 'info',
             confirmButtonText: 'Đóng'
         });
     };
-    
+
+
     const handleEdit = (item) => {
         Swal.fire({
             title: 'Chỉnh sửa thông tin đơn hàng',
@@ -127,49 +152,75 @@ const Orders = () => {
                 <input id="amount" type="number" class="swal2-input" style="width: 80%;" value="${item.amount}" disabled /><br/>
                 <label>Giảm giá:</label><br>
                 <input id="discount_amount" type="number" class="swal2-input" style="width: 80%;" value="${item.discount_amount}" disabled /><br/>
-                <label>Phí người dùng:</label><br>
-                <input id="user_fee_amount" type="number" class="swal2-input" style="width: 80%;" value="${item.user_fee_amount}" disabled /><br/>
-                <label>Kênh:</label><br>
-                <input id="channel" type="number" class="swal2-input" style="width: 80%;" value="${item.channel}" disabled /><br/>
                 <label>Thời gian server:</label><br>
                 <input id="server_time" type="number" class="swal2-input" style="width: 80%;" value="${item.server_time}" disabled /><br/>
-                <label>Dữ liệu nhúng:</label><br>
-                <textarea id="embed_data" class="swal2-textarea" style="width: 80%;">${item.embed_data}</textarea><br/>
+                <label>Tên người đặt hàng:</label><br>
+                <input id="name" type="text" class="swal2-input" style="width: 80%;" value="${item.embed_data.name}" /><br/>
+                <label>Số điện thoại người đặt hàng:</label><br>
+                <input id="phone" type="text" class="swal2-input" style="width: 80%;" value="${item.embed_data.phone}" /><br/>
+                <label>Email người đặt hàng:</label><br>
+                <input id="email" type="text" class="swal2-input" style="width: 80%;" value="${item.embed_data.email}" /><br/>
+                <label>Địa chỉ người đặt hàng:</label><br>
+                <input id="address" type="text" class="swal2-input" style="width: 80%;" value="${item.embed_data.address}" /><br/>
+                <label>Tình trạng đơn hàng:</label><br>
+                <select id="status" class="swal2-select" style="width: 80%;">
+                    <option value="Pending" ${item.embed_data.status === "Pending" ? "selected" : ""}>Đang chờ xác nhận</option>
+                    <option value="Preparing" ${item.embed_data.status === "Preparing" ? "selected" : ""}>Đang chuẩn bị</option>
+                    <option value="Shipping" ${item.embed_data.status === "Shipping" ? "selected" : ""}>Đang giao hàng</option>
+                    <option value="Completed" ${item.embed_data.status === "Completed" ? "selected" : ""}>Giao thành công</option>
+                    <option value="Cancelled" ${item.embed_data.status === "Cancelled" ? "selected" : ""}>Hủy</option>
+                </select><br/>
                 <label>Thông tin mặt hàng:</label><br>
-                <div id="item-list" style="max-height: 150px; overflow-y: auto;">
-                    ${item.itemData.map(productId => `
-                        <div style="margin: 5px 0;">
-                            <span style="cursor: pointer; color: blue;" onclick="handleInfoProduct('${productId}')">
-                                ${productId} <!-- Thay thế ID bằng tên sản phẩm từ fetch -->
-                            </span>
-                        </div>
-                    `).join('')}
+                <div style="margin-top: 20px;">
+                    <strong>Danh sách sản phẩm:</strong>
+                    <ul>
+                        ${item.itemData.map((productName, index) => `
+                            <li>
+                                <strong>${productName}</strong> - ${item.item[index].itemCount} bao
+                            </li>
+                        `).join('')}
+                    </ul>
                 </div>
             `,
             showCancelButton: true,
             confirmButtonText: 'Lưu',
             cancelButtonText: 'Hủy',
             preConfirm: () => {
-                const embed_data = Swal.getPopup().querySelector('#embed_data').value;
-                return { embed_data };
+                const name = Swal.getPopup().querySelector('#name').value;
+                const phone = Swal.getPopup().querySelector('#phone').value;
+                const email = Swal.getPopup().querySelector('#email').value;
+                const address = Swal.getPopup().querySelector('#address').value;
+                const status = Swal.getPopup().querySelector('#status').value;
+                return { name, phone, email, address, status };
             }
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const updatedData = result.value;
                 try {
                     // Cập nhật dữ liệu trong Firestore
-                    await updateDoc(doc(db, "orders", item.id), updatedData);
+                    await updateDoc(doc(db, "orders", item.id), {
+                        "embed_data.name": updatedData.name,
+                        "embed_data.phone": updatedData.phone,
+                        "embed_data.email": updatedData.email,
+                        "embed_data.address": updatedData.address,
+                        "embed_data.status": updatedData.status,
+                    });
                     // Cập nhật state
-                    setOrders(orders.map((ord) => (ord.id === item.id ? { ...ord, ...updatedData } : ord)));
-    
+                    setOrders(orders.map((ord) => (ord.id === item.id ? { ...ord, embed_data: { ...ord.embed_data, ...updatedData } } : ord)));
                     Swal.fire('Thành công!', 'Đơn hàng đã được cập nhật.', 'success');
+                    const user = await getDoc(doc(db, "users", item.app_user));
+                    const userData = user.data();
+                    if( userData?.token && userData?.notification ){
+                        sendNotificationToUser("Cập nhật đơn hàng", `Đơn hàng #${item.app_trans_id} của bạn đã chuyển sang ${updatedData.status}`, userData.token)
+                    }
+                    
                 } catch (error) {
                     console.error("Error updating order: ", error);
                     Swal.fire('Thất bại', 'Có lỗi xảy ra trong quá trình cập nhật', 'error');
                 }
             }
-        });
-    };    
+        })
+    };
 
     const handleDelete = async (item) => {
         Swal.fire({

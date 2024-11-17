@@ -2,10 +2,34 @@ import { useState } from 'react'
 import Swal from 'sweetalert2'
 import { Loader2 } from 'lucide-react'
 
-const FCm = () => {
-    const [title, setTitle] = useState('')
-    const [body, setBody] = useState('')
-    const [isSending, setIsSending] = useState(false)
+const FCM = () => {
+    const [title, setTitle] = useState('');
+    const [body, setBody] = useState('');
+    const [token, setToken] = useState('');
+    const [isSending, setIsSending] = useState(false);
+
+    const sendNotificationToUser = async (title, body, token) => {
+        try {
+            const response = await fetch('https://us-central1-namthanhstores.cloudfunctions.net/sendNotificationToUser', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title, body, token }),
+            })
+    
+            if (response.ok) {
+                console.log('Successfully sent message to user');
+                return true;
+            } else {
+                console.error('Error sending message to user:', await response.json())
+                throw new Error('Failed to send message to user');
+            }
+        } catch (error) {
+            console.error('Error sending message to user:', error)
+            throw error;
+        }
+    }
 
     const sendFCMNotification = async (title, body) => {
         try {
@@ -43,7 +67,11 @@ const FCm = () => {
 
         setIsSending(true)
         try {
-            await sendFCMNotification(title, body)
+            if (token) {
+                await sendNotificationToUser(title, body, token)
+            } else {
+                await sendFCMNotification(title, body)
+            }
             Swal.fire({
                 icon: 'success',
                 title: 'Thành công',
@@ -51,6 +79,7 @@ const FCm = () => {
             })
             setTitle('');
             setBody('');
+            setToken('');
         } catch (error) {
             Swal.fire({
                 icon: 'error',
@@ -95,6 +124,19 @@ const FCm = () => {
                         style={styles.input}
                     />
                 </div>
+                <div style={styles.inputGroup}>
+                    <label htmlFor="token" style={styles.label}>
+                        Token thông báo của người dùng (tùy chọn)
+                    </label>
+                    <input
+                        type="text"
+                        id="token"
+                        placeholder="Nhập token FCM (nếu có)"
+                        value={token}
+                        onChange={(e) => setToken(e.target.value)}
+                        style={styles.input}
+                    />
+                </div>
             </div>
             <div>
                 <button
@@ -116,7 +158,7 @@ const FCm = () => {
     )
 }
 
-export default FCm
+export default FCM
 
 const styles = {
     container: {
