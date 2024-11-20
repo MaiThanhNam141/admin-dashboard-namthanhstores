@@ -168,7 +168,7 @@ const Orders = () => {
                     <option value="Preparing" ${item.embed_data.status === "Preparing" ? "selected" : ""}>Đang chuẩn bị</option>
                     <option value="Shipping" ${item.embed_data.status === "Shipping" ? "selected" : ""}>Đang giao hàng</option>
                     <option value="Completed" ${item.embed_data.status === "Completed" ? "selected" : ""}>Giao thành công</option>
-                    <option value="Cancelled" ${item.embed_data.status === "Cancelled" ? "selected" : ""}>Hủy</option>
+                    <option value="Cancelled" ${item.embed_data.status === "Cancelled" ? "selected" : ""}>Đã hủy</option>
                 </select><br/>
                 <label>Thông tin mặt hàng:</label><br>
                 <div style="margin-top: 20px;">
