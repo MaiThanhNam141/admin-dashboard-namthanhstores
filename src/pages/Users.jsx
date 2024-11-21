@@ -31,7 +31,6 @@ const Users = () => {
     const indexOfFirstUser = indexOfLastUser - usersPerPage;
     const paginatedUsers = users.slice(indexOfFirstUser, indexOfLastUser);
 
-    // Handle page changes
     const handleNextPage = () => {
         if (currentPage < Math.ceil(users.length / usersPerPage)) {
             setCurrentPage(currentPage + 1);
@@ -67,7 +66,6 @@ const Users = () => {
                 `<div style="text-align: left; margin-bottom: 10px; position: relative; justifyContent: 'center'; alignItems: 'center',">
                     <label style="display: block; font-weight: bold;">Mật khẩu</label>
                     <input id="swal-input4" type="password" class="swal2-input" placeholder="Mật khẩu" style="width: 80%; padding-right: 30px;">
-                    
                 </div>`,
             focusConfirm: false,
             preConfirm: () => {
@@ -163,7 +161,6 @@ const Users = () => {
                 } catch (error) {
                     console.error("Error deleting user: ", error);
                     Swal.fire('Thất bại', 'Đã xảy ra lỗi nào đó', 'error');
-
                 }
             }
         });
