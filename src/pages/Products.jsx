@@ -149,6 +149,8 @@ const Products = () => {
                 <input id="netWeight" type="number" class="swal2-input" style="width: 80%;" value="${item.netWeight}" /><br/>
                 <label>Số lượng còn lại:</label><br>
                 <input id="quatity" type="number" class="swal2-input" style="width: 80%;" value="${item.quatity}" /><br/>
+                <label>Hạn sử dụng:</label><br>
+                <input type="number" class="swal2-input" style="width: 80%;" value="" /><br/>
                 <label>Giá:</label><br>
                 <input id="price" type="number" class="swal2-input" style="width: 80%;" value="${item.price}" /><br/>
                 <label>Giảm giá (%):</label><br>

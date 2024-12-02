@@ -214,7 +214,9 @@ const styles = {
         border: '1px solid #87bc9d',
         borderRadius: '0.375rem',
         outline: 'none',
-        height:'15%'
+        height:'15%',
+        maxWidth:'95%',
+        minWidth:'95%',
     },
 
     button: {

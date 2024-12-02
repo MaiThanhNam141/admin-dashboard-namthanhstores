@@ -1,17 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { db } from "../firebase/config";
 import { collection, getDocs } from 'firebase/firestore';
 import { Bar, Line } from 'react-chartjs-2';
 import Papa from 'papaparse';
 import 'chart.js/auto';
-import { Tooltip } from 'react-tooltip'
+import { Tooltip } from 'react-tooltip';
+import { Lock } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext';
 
 const Statistics = () => {
+    const { currentUser } = useContext(AuthContext);
+
+    const isAuthorized = currentUser?.email === 'maithanhnam@gmail.com';
+
     const [monthlyRevenue, setMonthlyRevenue] = useState([]);
     const [userTrending, setUserTrending] = useState([]);
     const [engagementData, setEngagementData] = useState([]);
 
     useEffect(() => {
+        if (!isAuthorized) return;
+
         const fetchOrders = async () => {
             try {
                 const ordersCollectionRef = collection(db, 'orders');
@@ -49,7 +57,6 @@ const Statistics = () => {
 
         fetchOrders();
 
-        // Load User Trending data from CSV file
         const loadUserTrendingData = async () => {
             const response = await fetch('/src/assets/csv/User-trending.csv');
             const text = await response.text();
@@ -71,7 +78,6 @@ const Statistics = () => {
 
         loadUserTrendingData();
 
-        // Load Engagement Time data from another CSV file
         const loadEngagementData = async () => {
             const response = await fetch('/src/assets/csv/Average-engagement-time-per-active-user.csv');
             const text = await response.text();
@@ -90,7 +96,16 @@ const Statistics = () => {
         };
 
         loadEngagementData();
-    }, []);
+    }, [isAuthorized]);
+
+    if (!isAuthorized) {
+        return (
+            <div style={styles.lockContainer}>
+                <Lock size={48} color='#000' />
+                <p style={styles.lockText}>Bạn không có quyền xem thông tin này</p>
+            </div>
+        );
+    }
 
     // Chart data for monthly revenue
     const revenueChartData = {
@@ -137,11 +152,11 @@ const Statistics = () => {
         ],
     };
 
-    const optionsUserActivityOverTime  = {
+    const optionsUserActivityOverTime = {
         scales: {
             y: {
                 ticks: {
-                    callback: function(value) {
+                    callback: function (value) {
                         // Chỉ hiển thị 0 và 1
                         return value % 1 === 0 ? value : null;
                     },
@@ -168,9 +183,8 @@ const Statistics = () => {
 
     return (
         <div style={styles.container}>
-
             <h1 style={styles.text}>Doanh thu theo tháng</h1>
-            <div style={{ height: '400px', width:'50%', flex: 1, marginBottom:'100px' }}>
+            <div style={{ height: '400px', width: '50%', flex: 1, marginBottom: '100px' }}>
                 <Bar data={revenueChartData} />
             </div>
             <h1
@@ -191,8 +205,8 @@ const Statistics = () => {
                     <p>Bạn có thể sử dụng thông tin này để theo dõi sự thay đổi trong hoạt động của người dùng.</p>
                 </div>
             </Tooltip>
-            <div style={{ height: '400px', width:'50%', flex: 1, marginBottom:'100px' }}>
-                <Line data={UserActivityOverTime} options={optionsUserActivityOverTime}/>
+            <div style={{ height: '400px', width: '50%', flex: 1, marginBottom: '100px' }}>
+                <Line data={UserActivityOverTime} options={optionsUserActivityOverTime} />
             </div>
 
             <h1 style={styles.text} id="engagementTooltip">Thời gian tương tác trung bình trên mỗi người dùng</h1>
@@ -201,7 +215,7 @@ const Statistics = () => {
                     <span>Thời gian tương tác trung bình trên mỗi người dùng hoạt động trong khoảng thời gian đã chọn.</span>
                 </div>
             </Tooltip>
-            <div style={{ height: '400px', width:'50%', flex: 1, marginBottom:'100px' }}>
+            <div style={{ height: '400px', width: '50%', flex: 1, marginBottom: '100px' }}>
                 <Line data={engagementChartData} />
             </div>
         </div>
@@ -218,6 +232,19 @@ const styles = {
         alignItems: 'center',
         height: '100%',
         minHeight: '100vh',
+    },
+    lockContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        textAlign: 'center',
+    },
+    lockText: {
+        color: '#000',
+        fontSize: '20px',
+        marginTop: '10px',
     },
     text: {
         color: '#000',
