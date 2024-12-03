@@ -2,10 +2,12 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAlYmoqbIkEjR0eGUIYWHrZU9Pv7GLALxU",
   authDomain: "namthanhstores.firebaseapp.com",
+  databaseURL: "https://namthanhstores-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "namthanhstores",
   storageBucket: "namthanhstores.appspot.com",
   messagingSenderId: "140469949329",
@@ -15,9 +17,10 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 
 const auth = getAuth(app);
 const db = getFirestore(app);
+const realtimeDatabase = getDatabase(app);
+const analytics = getAnalytics(app);
 
-export { auth, db, analytics }
+export { auth, db, realtimeDatabase, analytics }

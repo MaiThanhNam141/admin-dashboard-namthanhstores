@@ -8,6 +8,7 @@ import Products from './pages/Products.jsx';
 import Users from './pages/Users.jsx';
 import NotFound from './pages/NotFound.jsx';
 import FCM from './pages/FCM.jsx';
+import SupporterChat from './pages/SupporterChat.jsx';
 
 import { AuthContext } from './context/AuthContext.jsx';
 
@@ -30,6 +31,7 @@ function App() {
           <Route path="products" element={<Products />} />
           <Route path="users" element={<Users />} />
           <Route path="fcm" element={<FCM />} />
+          <Route path="support" element={<SupporterChat />} />
         </Route>
         <Route path="login" element={<Login />} />
         <Route path="*" element={<NotFound />} />

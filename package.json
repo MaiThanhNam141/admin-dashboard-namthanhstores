@@ -12,6 +12,7 @@
   "dependencies": {
     "@firebase/app": "^0.10.13",
     "@firebase/auth": "^1.7.9",
+    "@firebase/database": "^1.0.10",
     "@firebase/firestore": "^4.7.3",
     "@firebase/storage": "^0.13.2",
     "chart.js": "^4.4.6",
