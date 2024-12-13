@@ -58,7 +58,7 @@ const Statistics = () => {
         fetchOrders();
 
         const loadUserTrendingData = async () => {
-            const response = await fetch('/src/assets/csv/User-trending.csv');
+            const response = await fetch('/src/assets/csv/User-trending.txt');
             const text = await response.text();
 
             Papa.parse(text, {
@@ -79,7 +79,7 @@ const Statistics = () => {
         loadUserTrendingData();
 
         const loadEngagementData = async () => {
-            const response = await fetch('/src/assets/csv/Average-engagement-time-per-active-user.csv');
+            const response = await fetch('/src/assets/csv/Average-engagement-time-per-active-user.txt');
             const text = await response.text();
 
             Papa.parse(text, {
