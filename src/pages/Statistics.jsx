@@ -2,11 +2,11 @@ import React, { useState, useEffect, useContext } from 'react';
 import { db } from "../firebase/config";
 import { collection, getDocs } from 'firebase/firestore';
 import { Bar, Line } from 'react-chartjs-2';
-import Papa from 'papaparse';
 import 'chart.js/auto';
 import { Tooltip } from 'react-tooltip';
 import { Lock } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
+import { engagementDataJS, userTrendingJS } from '../assets/csv/chartData';
 
 const Statistics = () => {
     const { currentUser } = useContext(AuthContext);
@@ -57,45 +57,8 @@ const Statistics = () => {
 
         fetchOrders();
 
-        const loadUserTrendingData = async () => {
-            const response = await fetch('/src/assets/csv/User-trending.txt');
-            const text = await response.text();
-
-            Papa.parse(text, {
-                header: true,
-                skipEmptyLines: true,
-                complete: (result) => {
-                    const trendingData = result.data.map(row => ({
-                        nthDay: Number(row['Nthday']),
-                        days30: Number(row['days30']),
-                        days7: Number(row['days7']),
-                        days1: Number(row['day1']),
-                    }));
-                    setUserTrending(trendingData);
-                },
-            });
-        };
-
-        loadUserTrendingData();
-
-        const loadEngagementData = async () => {
-            const response = await fetch('/src/assets/csv/Average-engagement-time-per-active-user.txt');
-            const text = await response.text();
-
-            Papa.parse(text, {
-                header: true,
-                skipEmptyLines: true,
-                complete: (result) => {
-                    const engagement = result.data.map(row => ({
-                        nthDay: Number(row['Nth day']),
-                        avgEngagementTime: Number(row['Average engagement time per active user']),
-                    }));
-                    setEngagementData(engagement);
-                },
-            });
-        };
-
-        loadEngagementData();
+        setEngagementData(engagementDataJS)
+        setUserTrending(userTrendingJS)
     }, [isAuthorized]);
 
     if (!isAuthorized) {

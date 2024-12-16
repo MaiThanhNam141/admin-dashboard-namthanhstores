@@ -1,8 +1,9 @@
 import React, { useState, useContext } from 'react';
 import Logo from "../assets/logo.png";
-import { auth } from "../firebase/config"
+import { auth, db } from "../firebase/config"
 import Swal from 'sweetalert2';
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../context/AuthContext';
 import loadingGif from '../assets/loading.gif';
@@ -27,6 +28,36 @@ const Login = () => {
 
     const handleShowPassword = () => {
         setShowPassword(!showPassword);
+    };
+
+    const handleCheckStaff = async (email) => {
+        try {
+            const usersCollection = collection(db, 'users');
+            const staffQuery = query(usersCollection, where('email', '==', email), where('staff', '==', true));
+            const snapshot = await getDocs(staffQuery);
+
+            // Kiểm tra nếu snapshot có dữ liệu
+            if (!snapshot.empty) {
+                return true; // Email này có quyền staff
+            } else {
+                Swal.fire({
+                    title: 'Đăng nhập thất bại!',
+                    text: 'Email của bạn không được cấp quyền nhân viên.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                });
+                return false; // Email này không có quyền staff
+            }
+        } catch (error) {
+            console.error("Error checking staff: ", error);
+            Swal.fire({
+                title: 'Lỗi kiểm tra quyền!',
+                text: 'Đã xảy ra lỗi trong quá trình kiểm tra quyền. Vui lòng thử lại sau.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+            return false;
+        }
     };
 
     const handleLogin = async (event) => {
@@ -67,6 +98,12 @@ const Login = () => {
             });
             return null;
         }
+
+        const hasAccess = await handleCheckStaff(e);
+        if (!hasAccess) {
+            return;
+        }
+
         try {
             await signInWithEmailAndPassword(auth, e, p)
                 .then((userCredential) => {
